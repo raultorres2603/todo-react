@@ -10,7 +10,14 @@ class App extends React.Component {
   }
 
   render() {
-    return <ListTodos />;
+    return (
+      <div className="mainCont">
+        <div className="row mb-3 text-center">
+          <h1>TECH TEST</h1>
+        </div>
+        <ListTodos />
+      </div>
+    );
   }
 }
 

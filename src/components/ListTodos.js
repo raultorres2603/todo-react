@@ -1,9 +1,11 @@
 import React from "react";
+import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import axios from "axios";
+import CreateTodos from "./CreateTodos";
 
-class listTodos extends React.Component {
+class ListTodos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,7 +15,14 @@ class listTodos extends React.Component {
     this.handleCreation = this.handleCreation.bind(this);
   }
 
-  handleCreation() {}
+  handleCreation() {
+    const app = ReactDOM.createRoot(document.getElementById("App"));
+    app.render(
+      <React.StrictMode>
+        <CreateTodos />
+      </React.StrictMode>
+    );
+  }
 
   handleChangeFilter() {
     // We will manage the change filter from the UserID filter
@@ -39,7 +48,7 @@ class listTodos extends React.Component {
         }
       })
       .catch((reason) => {
-        console.log(reason);
+        alert(reason);
       });
   }
 
@@ -59,17 +68,14 @@ class listTodos extends React.Component {
         );
       })
       .catch((reason) => {
-        console.log(reason);
+        alert(reason);
       });
   }
 
   render() {
     return (
-      <div className="App">
+      <div className="App" id="App">
         <div className="container">
-          <div className="row mb-3">
-            <h1>TECH TEST</h1>
-          </div>
           <div className="row">
             <div className="col">
               <h3>Filter:</h3>
@@ -90,7 +96,11 @@ class listTodos extends React.Component {
             </div>
             <div className="col">
               <div className="d-grid gap-2">
-                <button className="btn btn-success" type="button">
+                <button
+                  className="btn btn-success"
+                  type="button"
+                  onClick={this.handleCreation}
+                >
                   Create TODO's
                 </button>
               </div>
@@ -133,4 +143,4 @@ class listTodos extends React.Component {
   }
 }
 
-export default listTodos;
+export default ListTodos;
