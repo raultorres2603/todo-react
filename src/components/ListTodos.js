@@ -1,9 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import axios from "axios";
 import CreateTodos from "./CreateTodos";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 class ListTodos extends React.Component {
   constructor(props) {
@@ -13,15 +14,44 @@ class ListTodos extends React.Component {
     };
     this.handleChangeFilter = this.handleChangeFilter.bind(this);
     this.handleCreation = this.handleCreation.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   handleCreation() {
-    const app = ReactDOM.createRoot(document.getElementById("App"));
-    app.render(
+    ReactDOM.render(
       <React.StrictMode>
         <CreateTodos />
-      </React.StrictMode>
+      </React.StrictMode>,
+      document.getElementById("App")
     );
+  }
+
+  handleEdit(e) {
+    let todo = JSON.parse(JSON.stringify(e.target.value).trim());
+    console.log(todo);
+    ReactDOM.render(
+      <React.StrictMode>
+        <CreateTodos todo={todo} />
+      </React.StrictMode>,
+      document.getElementById("App")
+    );
+  }
+
+  handleDelete(e) {
+    let todo = JSON.parse(e.target.value.trim());
+    console.log(todo);
+
+    if (window.confirm("Are you sure? This operation can not be undone")) {
+      axios
+        .delete(`https://jsonplaceholder.typicode.com/todos/${todo.id}`)
+        .then((res) => {
+          alert(`Delete success!\n\n${JSON.stringify(todo)}`);
+        })
+        .catch((reason) => {
+          alert(reason);
+        });
+    }
   }
 
   handleChangeFilter() {
@@ -115,22 +145,38 @@ class ListTodos extends React.Component {
                   <th scope="col">ID</th>
                   <th scope="col">Title</th>
                   <th scope="col">Completed</th>
+                  <th scope="col">Edit</th>
+                  <th scope="col">Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {this.state.todos.map((todo, index) => (
                   <tr key={index + 1}>
-                    <td id={`userId_${index}`} key={index + 2}>
-                      {todo.userId}
-                    </td>
-                    <td id={`id_${index}`} key={index + 3}>
-                      {todo.id}
-                    </td>
-                    <td id={`title_${index}`} key={index + 4}>
-                      {todo.title}
-                    </td>
-                    <td id={`completed_${index}`} key={index + 5}>
+                    <td id={`userId_${index}`}>{todo.userId}</td>
+                    <td id={`id_${index}`}>{todo.id}</td>
+                    <td id={`title_${index}`}>{todo.title}</td>
+                    <td id={`completed_${index}`}>
                       {todo.completed.toString()}
+                    </td>
+                    <td id={`edit_${index}`}>
+                      <button
+                        className="btn btn-info"
+                        type="button"
+                        value={JSON.stringify(todo).trim()}
+                        onClick={this.handleEdit}
+                      >
+                        Edit
+                      </button>
+                    </td>
+                    <td id={`delete_${index}`}>
+                      <button
+                        className="btn btn-danger"
+                        type="button"
+                        value={JSON.stringify(todo).trim()}
+                        onClick={this.handleDelete}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -1,9 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import axios from "axios";
 import ListTodos from "./ListTodos";
+import App from "../App";
 
 class CreateTodos extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class CreateTodos extends React.Component {
     this.handleReturn = this.handleReturn.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChangeInp = this.handleChangeInp.bind(this);
+    this.handleChangeTodo = this.handleChangeTodo.bind(this);
     this.state = {
       userId: 0,
       title: "",
@@ -19,12 +21,34 @@ class CreateTodos extends React.Component {
   }
 
   handleReturn() {
-    const app = ReactDOM.createRoot(document.getElementById("App"));
-    app.render(
-      <React.StrictMode>
-        <ListTodos />
-      </React.StrictMode>
-    );
+    ReactDOM.render(<ListTodos />, document.getElementById("App"));
+  }
+
+  componentDidMount() {
+    if (this.props.todo) {
+      this.setState({
+        userId: JSON.parse(this.props.todo).userId,
+        title: JSON.parse(this.props.todo).title,
+        completed: JSON.parse(this.props.todo).completed,
+      });
+    }
+  }
+
+  handleChangeTodo(e) {
+    e.preventDefault();
+
+    axios
+      .put(`https://jsonplaceholder.typicode.com/todos/${this.state.userId}`, {
+        userId: this.state.userId,
+        title: this.state.title,
+        completed: this.state.completed,
+      })
+      .then((res) => {
+        alert(`Update Success!\n\n${JSON.stringify(res.data)}`);
+      })
+      .catch((reason) => {
+        alert(reason);
+      });
   }
 
   handleSubmit(e) {
@@ -119,7 +143,11 @@ class CreateTodos extends React.Component {
           <h2>Create TODO's</h2>
         </div>
         <div className="row">
-          <form onSubmit={this.handleSubmit}>
+          <form
+            onSubmit={
+              this.props.todo ? this.handleChangeTodo : this.handleSubmit
+            }
+          >
             <div className="row">
               <div className="col-4">
                 <div className="form-floating mb-3">
@@ -130,6 +158,11 @@ class CreateTodos extends React.Component {
                     name="userId"
                     onChange={this.handleChangeInp}
                     placeholder="Put User ID here"
+                    defaultValue={
+                      this.props.todo
+                        ? JSON.parse(this.props.todo.trim()).userId
+                        : ""
+                    }
                   />
                   <label htmlFor="floatingInput">User ID</label>
                 </div>
@@ -142,6 +175,11 @@ class CreateTodos extends React.Component {
                     id="title"
                     name="title"
                     onChange={this.handleChangeInp}
+                    defaultValue={
+                      this.props.todo
+                        ? JSON.parse(this.props.todo.trim()).title
+                        : ""
+                    }
                     placeholder="Put title here"
                   />
                   <label htmlFor="floatingInput">Title</label>
@@ -155,7 +193,11 @@ class CreateTodos extends React.Component {
                     name="completed"
                     aria-label="Completed"
                     onChange={this.handleChangeInp}
-                    defaultValue="Open"
+                    defaultValue={
+                      this.props.todo
+                        ? JSON.parse(this.props.todo.trim()).completed
+                        : "Open"
+                    }
                   >
                     <option value="Open">Open this select menu</option>
                     <option value="true">Completed</option>
